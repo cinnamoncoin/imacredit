@@ -1,0 +1,6 @@
+imacredit-qt usr/bin
+share/pixmaps/imacredit32.xpm usr/share/pixmaps
+share/pixmaps/imacredit16.xpm usr/share/pixmaps
+share/pixmaps/imacredit128.png usr/share/pixmaps
+debian/imacredit-qt.desktop usr/share/applications
+debian/imacredit-qt.protocol usr/share/kde4/services/

@@ -1,0 +1,20 @@
+This directory contains files used to package imacreditd/imacredit-qt
+for Debian-based Linux systems.
+
+If you compile imacreditd/imacredit-qt yourself, there are some
+useful files here:
+
+imacredit: URI support
+--------------------
+
+imacredit-qt.desktop  (Gnome / Open Desktop)
+To install:
+  sudo desktop-file-install imacredit-qt.desktop
+  sudo update-desktop-database
+
+If you build yourself, you will either need to modify the paths in
+the .desktop file or copy or symlink your imacredit-qt binary to /usr/bin
+and the ../../share/pixmaps/imacredit128.png to /usr/share/pixmaps
+
+imacredit-qt.protocol (KDE)
+

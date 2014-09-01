@@ -1,0 +1,12 @@
+Building IMAcredit
+
+See doc/readme-qt.rst for instructions on building IMAcredit-Qt,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of IMAcredit.
+
+See doc/build-*.txt for instructions on building imacreditd,
+the intended-for-services, no-graphical-interface, reference
+implementation of IMAcredit.
+
+Further build information and documentation is available at
+the official IMAcredit website, http://www.imacredit.org

@@ -1,0 +1,11 @@
+[Protocol]
+exec=imacredit-qt '%u'
+protocol=imacredit
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

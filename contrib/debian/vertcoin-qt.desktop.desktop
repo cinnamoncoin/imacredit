@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=IMAcredit
+Comment=IMAcredit P2P Cryptocurrency
+Exec=/usr/bin/imacredit-qt %u
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/imacredit128.png
+MimeType=x-scheme-handler/bitcoin;
+Categories=Office;
+Name[en_US]=imacredit-qt.desktop
