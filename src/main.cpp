@@ -32,7 +32,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0xcfec50d279095078cd8d719f10858d3389c06d8098ddba70eb30b4f0675b3f68");
+uint256 hashGenesisBlock("0xdae24b8221b23acd0c8f53475ee8d15d263c4bc42b5474753b7c6354fd880394");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // IMAcredit: starting difficulty is 1 / 2^12  Default=>>20
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -1081,12 +1081,14 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
+const unsigned char minNfactor = 16;  // Factor used to generate genesis key
+const unsigned char maxNfactor = 32;
+
 unsigned char GetNfactor(int64 nTimestamp) {
-// set by hand whenever technology leaps
 //    int l = 0;
 
-//   if (nTimestamp <= nChainStartTime)
-//        return minNfactor;
+    if (nTimestamp <= nChainStartTime)
+        return minNfactor;
 
 //    int64 s = nTimestamp - nChainStartTime;
 //    while ((s >> 1) > 3) {
@@ -1096,18 +1098,17 @@ unsigned char GetNfactor(int64 nTimestamp) {
 
 //    s &= 3;
 
-//    int n = (l * 158 + s * 28 - 2670) / 100;
+    int n = Nfactor;  // Set to desired current value 
 
-//    if (n < 0) n = 0;
+    if (n < 0) n = 0;
 
-//    if (n > 255)
-//       printf( "GetNfactor(%lld) - something wrong(n == %d)\n", nTimestamp, n );
+    if (n > 255)
+       printf( "GetNfactor(%lld) - something wrong(n == %d)\n", nTimestamp, n );
 
-//    unsigned char N = (unsigned char) n;
-    //printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
+//    printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
 
-//    return min(max(N, minNfactor), maxNfactor);
-      return Nfactor;
+    unsigned char N = (unsigned char) n;
+    return min(max(N, minNfactor), maxNfactor);
 }
 
 
@@ -2817,7 +2818,7 @@ bool InitBlockIndex() {
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce = 6210083;
+        block.nNonce =  6221151;
         block.nTime =  1409527504;  /* 1CRedit block 4949 time */
         
         if (fTestNet)
