@@ -33,7 +33,7 @@ unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
 uint256 hashGenesisBlock("0xcfec50d279095078cd8d719f10858d3389c06d8098ddba70eb30b4f0675b3f68");
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 14); // IMAcredit: starting difficulty is 1 / 2^6  Default=>>20
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // IMAcredit: starting difficulty is 1 / 2^12  Default=>>20
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 uint256 nBestChainWork = 0;
@@ -2767,7 +2767,7 @@ bool LoadBlockIndex()
             CTxOut(error)
         vMerkleTree: b273fc72b6ae7f5a3eb2f328f85e197168016e573f2fd9686f32e02f437559a2*/
         
-        /*pchMessageStart[0] = 0xfc;
+        /*12[0] = 0xfc;
         pchMessageStart[1] = 0xc1;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xdc;*/
@@ -3121,7 +3121,7 @@ bool static AlreadyHave(const CInv& inv)
 // The message start string is designed to be unlikely to occur in normal data.
 // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
-unsigned char pchMessageStart[4] = { 0xeb, 0xa0, 0xa6, 0xcb }; // IMAcredit: increase each by adding 1 to bitcoin's value.
+unsigned char pchMessageStart[4] = { 'I', 'M', 'A', 'C' }; 
 
 
 void static ProcessGetData(CNode* pfrom)

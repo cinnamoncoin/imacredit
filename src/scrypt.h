@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /** Nfactor - the n-scrypt factor **/
-static const unsigned char Nfactor = 16;
+static const unsigned char Nfactor = 10;
 /** Size of scratchpad space needed on the heap per thread **/
 static const unsigned long int SCRATCHPAD_SIZE = ((1 << (Nfactor + 1)) * 128 ) + 63;
 
