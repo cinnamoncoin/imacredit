@@ -1,9 +1,13 @@
 #ifndef SCRYPT_H
 #define SCRYPT_H
+#include <new>
 #include <stdlib.h>
 #include <stdint.h>
 
-static const int SCRYPT_SCRATCHPAD_SIZE = 131072 + 63;
+/** Nfactor - the n-scrypt factor **/
+static const unsigned char Nfactor = 16;
+/** Size of scratchpad space needed on the heap per thread **/
+static const unsigned long int SCRATCHPAD_SIZE = ((1 << (Nfactor + 1)) * 128 ) + 63;
 
 void scrypt_N_1_1_256(const char *input, char *output, unsigned char Nfactor);
 void scrypt_N_1_1_256_sp_generic(const char *input, char *output, char *scratchpad, unsigned char Nfactor);

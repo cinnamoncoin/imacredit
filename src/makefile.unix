@@ -5,6 +5,7 @@
 # :=1 --> Enable IPv6 support
 # :=0 --> Disable IPv6 support
 USE_IPV6:=1
+USE_SSE2:=1
 
 LINK:=$(CXX)
 

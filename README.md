@@ -15,7 +15,7 @@ What is IMAcredit?
 IMAcredit is a lite version of Bitcoin using scrypt-adaptive-N as a proof-of-work algorithm.
  - 256 second (~4.3) minute block targets
  - subsidy constant for life of coin
- - ~84 million total coins
+ - ~92B coins (limit of 64 bit math)
  - 16 coins per block
  - Every block to retarget difficulty with Kimotos Gravity Well algorithm
 

@@ -11,6 +11,7 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "checkqueue.h"
+#include "scrypt.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -31,8 +32,8 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x4d96a915f49d40b1e5c2844d1ee2dccb90013a990ccea12c492d22110489f0c4");
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // IMAcredit: starting difficulty is 1 / 2^12
+uint256 hashGenesisBlock("0xcfec50d279095078cd8d719f10858d3389c06d8098ddba70eb30b4f0675b3f68");
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 14); // IMAcredit: starting difficulty is 1 / 2^6  Default=>>20
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 uint256 nBestChainWork = 0;
@@ -48,6 +49,7 @@ bool fBenchmark = false;
 bool fTxIndex = false;
 unsigned int nCoinCacheSize = 5000;
 int64 nChainStartTime = 1409527504; // 1Credit block 4949
+
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
 int64 CTransaction::nMinTxFee = 1;
@@ -1079,12 +1081,8 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
-// yacoin: increasing Nfactor gradually
-const unsigned char Nfactor = 20;
-
 unsigned char GetNfactor(int64 nTimestamp) {
 // set by hand whenever technology leaps
-    int n = Nfactor;
 //    int l = 0;
 
 //   if (nTimestamp <= nChainStartTime)
@@ -1102,14 +1100,14 @@ unsigned char GetNfactor(int64 nTimestamp) {
 
 //    if (n < 0) n = 0;
 
-    if (n > 255)
-        printf( "GetNfactor(%lld) - something wrong(n == %d)\n", nTimestamp, n );
+//    if (n > 255)
+//       printf( "GetNfactor(%lld) - something wrong(n == %d)\n", nTimestamp, n );
 
 //    unsigned char N = (unsigned char) n;
     //printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
 
 //    return min(max(N, minNfactor), maxNfactor);
-      return n;
+      return Nfactor;
 }
 
 
@@ -2777,7 +2775,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 'm';
         pchMessageStart[2] = 'a';
         pchMessageStart[3] = 'c';
-        hashGenesisBlock = uint256("0xbd270cb82121e85f4eba6d0c2ffdc9eb74674eb9bafed9bbaa0fe8f47d971aae");
+        hashGenesisBlock = uint256("0x75ba2485e3bb2894cfd993a7cf18bfdb2440732a94c63c95801a17c04724deee");
         //hashGenesisBlock = uint256("0xf5ae71e26c74beacc88382716aced69cddf3dffff24f384e1808905e0188f68f");
     }
 
@@ -2819,13 +2817,13 @@ bool InitBlockIndex() {
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce = 5749262;
+        block.nNonce = 6210083;
         block.nTime =  1409527504;  /* 1CRedit block 4949 time */
         
         if (fTestNet)
         {
 
-            block.nNonce = 11521194;
+            block.nNonce = 11563501;
             block.nTime =  1409527504;
         }
 
@@ -2834,9 +2832,42 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x4af38ca0e323c0a5226208a73b7589a52c030f234810cf51e13e3249fc0123e7"));
-       
-        
+        assert(block.hashMerkleRoot == uint256("0x92b9c4799709b780ba2d3e1d6ad6a5ba9660ca7dfca5512eab2dac4dad486011"));
+
+        // set to true to mine genesis block
+        // If genesis block hash does not match, then generate new genesis hash.
+        if (false && block.GetHash() != hashGenesisBlock)
+        {
+            printf("Searching for genesis block...\n");
+            // This will figure out a valid hash and Nonce if you're
+            // creating a different genesis block:
+            uint256 hashTarget = CBigNum().SetCompact(block.nBits).getuint256();
+            uint256 thash;
+            char * scratchpad = new char [SCRATCHPAD_SIZE];
+
+            while(true)
+            {
+                scrypt_N_1_1_256_sp_generic(BEGIN(block.nVersion), BEGIN(thash), scratchpad, GetNfactor(block.nTime));
+
+                if (thash <= hashTarget)
+                    break;
+                if ((block.nNonce & 0xFFF) == 0)
+                {
+                    printf("nonce %08X: hash = %s (target = %s)\n", block.nNonce, thash.ToString().c_str(), hashTarget.ToString().c_str());
+                }
+                ++block.nNonce;
+                if (block.nNonce == 0)
+                {
+                    printf("NONCE WRAPPED, incrementing time\n");
+                    ++block.nTime;
+                }
+            }
+	    delete[] scratchpad;
+            printf("block.nTime = %u \n", block.nTime);
+            printf("block.nNonce = %u \n", block.nNonce);
+            printf("block.GetHash = %s\n", block.GetHash().ToString().c_str());
+        }
+ 
         block.print();
         assert(hash == hashGenesisBlock);
 
@@ -4565,6 +4596,7 @@ void static IMAcreditMiner(CWallet *pwallet)
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
     unsigned int nExtraNonce = 0;
+    char * scratchpad = new char[SCRATCHPAD_SIZE];
 
     try { loop {
         while (vNodes.empty())
@@ -4609,11 +4641,7 @@ void static IMAcreditMiner(CWallet *pwallet)
             unsigned int nHashesDone = 0;
 
             uint256 thash;
-            
-            unsigned long int scrypt_scratpad_size_current_block = ((1 << (GetNfactor(pblock->nTime) + 1)) * 128 ) + 63;
-            
-            char scratchpad[scrypt_scratpad_size_current_block];
-            
+
             /*printf("nTime -> %d", pblock->nTime);
             printf("scrypt_scratpad_size_current_block -> %ld", sizeof(scrypt_scratpad_size_current_block));
             printf("scratchpad -> %d", sizeof(scratchpad));*/
@@ -4690,7 +4718,9 @@ void static IMAcreditMiner(CWallet *pwallet)
                 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
             }
         }
-    } }
+      }
+    delete[] scratchpad;
+    }
     catch (boost::thread_interrupted)
     {
         printf("IMAcreditMiner terminated\n");
