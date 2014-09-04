@@ -4678,12 +4678,12 @@ void static IMAcreditMiner(CWallet *pwallet)
             }
             else
                 nHashCounter += nHashesDone;
-            if (GetTimeMillis() - nHPSTimerStart > 4000)
+            if (GetTimeMillis() - nHPSTimerStart > 30000)  // average over 30 seconds
             {
                 static CCriticalSection cs;
                 {
                     LOCK(cs);
-                    if (GetTimeMillis() - nHPSTimerStart > 4000)
+                    if (GetTimeMillis() - nHPSTimerStart > 30000)
                     {
                         dHashesPerSec = 1000.0 * nHashCounter / (GetTimeMillis() - nHPSTimerStart);
                         nHPSTimerStart = GetTimeMillis();
@@ -4692,7 +4692,7 @@ void static IMAcreditMiner(CWallet *pwallet)
                         if (GetTime() - nLogTime > 30 * 60)
                         {
                             nLogTime = GetTime();
-                            printf("hashmeter %6.0f khash/s\n", dHashesPerSec/1000.0);
+                            printf("hashmeter %6.0f hash/s\n", dHashesPerSec);
                         }
                     }
                 }
